@@ -1,0 +1,41 @@
+body.page {
+	background-color: #ddd;
+	font-family: "Calibry";
+}
+
+
+div.mainWindow {
+	width: 600px;
+	height: 300px;
+	padding: 5px;
+	border: 2px solid #999;
+	border-radius: 5px;
+	background-color: #fff;
+}
+
+
+input#sendButton {
+	display: inline;
+	width: 13%;
+	height: 22%;
+	vertical-align: top;
+	margin: 15px 0px;
+}
+
+#sendTextArea {
+	display: inline;
+	width: 85%;
+	height: 20%;
+	margin: 15px 0px;
+}
+#systemTextArea {
+	display: inline;
+	width: 99%;
+	height: 15%;
+	margin: 15px 0px;
+}
+#receiveTextArea {
+	display: inline;
+	width: 99%;
+	height: 30%;
+}
