@@ -6,7 +6,7 @@ body.page {
 
 div.mainWindow {
 	width: 600px;
-	height: 300px;
+	height: 250px;
 	padding: 5px;
 	border: 2px solid #999;
 	border-radius: 5px;
@@ -17,25 +17,26 @@ div.mainWindow {
 input#sendButton {
 	display: inline;
 	width: 13%;
-	height: 22%;
+	height: 18%;
 	vertical-align: top;
-	margin: 15px 0px;
+	margin: 10px 0px;
 }
 
 #sendTextArea {
 	display: inline;
 	width: 85%;
-	height: 20%;
-	margin: 15px 0px;
+	height: 15%;
+	margin: 10px 0px;
 }
 #systemTextArea {
 	display: inline;
 	width: 99%;
-	height: 15%;
-	margin: 15px 0px;
+	height: 35%;
+	margin: 0px;
 }
 #receiveTextArea {
 	display: inline;
 	width: 99%;
-	height: 30%;
+	height: 25%;
+	margin: 10px 0px;
 }

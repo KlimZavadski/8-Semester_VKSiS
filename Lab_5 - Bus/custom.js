@@ -1,9 +1,9 @@
 var busIsReady = "BusIsReady";
 var dataObject = "Data";
+var collizionObject = "CollizionData";
 
-var status = "";
 var countOfAttempt;
-var ifg = 10;
+var ifg = 20;
 
 
 $(document).ready(function () {
@@ -12,13 +12,8 @@ $(document).ready(function () {
 
 function Initialize() {
 	window.addEventListener('storage', receiveData, false);
-	window.addEventListener('change', function () {$('#statusTextArea').val("~")}, false);
 	localStorage.setItem(busIsReady, true);
 	clearSendTextArea();
-
-	$(status).change(function () {
-		$('#statusTextArea').val(status);
-	});
 
 	$('#sendButton').click(sendData);
 
@@ -33,7 +28,8 @@ function Initialize() {
 
 	$('#resetButton').click(function () {
 		clearSendTextArea();
-		status = 0;
+		setStatus("");
+		$('#systemTextArea').val("");
 		$('#receiveTextArea').val("");
 		localStorage.clear();
 	});
@@ -49,35 +45,30 @@ function clearSendTextArea()
 function sendData()
 {
 	var str = $('#sendTextArea').val();
-	countOfAttempt = 0;
-	status = "";
 
 	for (i = 0; i < str.length; i++)
 	{
 		var data = str[i];
+		countOfAttempt = 0;
+
 		while (true)
 		{
+			sleep(ifg);
+
 			if (localStorage.getItem(busIsReady))
 			{
 				localStorage.setItem(busIsReady, false);
-				// Wait IFG.
-				sleep(ifg);
-				localStorage.setItem(dataObject, data);
+				localStorage.setItem(dataObject, data + countOfAttempt);
+				sleep(50);
 				localStorage.setItem(busIsReady, true);
-				sleep(100);
 
-				if (localStorage.getItem(dataObject) == data)
+				if (data + countOfAttempt != localStorage.getItem(dataObject))
 				{
-					status = "Receive OK.";
-					break;
-				}
-				else
-				{
-					// Send Jam.
+					setStatus("Collizion");
 					countOfAttempt++;
 					if (countOfAttempt > 16)
 					{
-						status = "Receive error. Out of attempt's limit.";
+						setStatus("\nReceive error. Out of attempt's limit.", 0);
 						i = str.length;
 						break;
 					}
@@ -86,8 +77,12 @@ function sendData()
 						var k = Math.min(countOfAttempt, 10);
 						var wait = Math.pow(2, k);
 						sleep(Math.random() * wait);
-						break;
 					}
+				}
+				else
+				{
+					//addText("#receiveTextArea", data);
+					break;
 				}
 			}
 		}
@@ -96,14 +91,31 @@ function sendData()
 
 function receiveData (event)
 {
-	if (event.key == dataObject)
+	if (event.key == dataObject && event.newValue[1] == 0)
 	{
-		var val = $('#receiveTextArea').val();
-		$('#receiveTextArea').val(val + event.newValue);
+		addText("#receiveTextArea", event.newValue[0]);
+	}
+	else if (event.key == collizionObject)
+	{
+		//addText("#systemTextArea", "  Collizion");
 	}
 }
 
 
+function setStatus(status)
+{
+	//addText("#systemTextArea", "  " + status);
+	if (status == "Collizion")
+	{
+		localStorage.setItem(collizionObject, Math.random());
+	}
+}
+
+function addText(textAreaName, text)
+{
+	var textArea = $(textAreaName);
+	$(textAreaName).val(textArea.val() + text);
+}
 
 function sleep(millis)
 {
