@@ -1,0 +1,51 @@
+body.page {
+	background-color: #ddd;
+	font-family: "Calibry";
+}
+
+
+div.mainWindow {
+	display: inline-block;
+	width: 400px;
+	height: 250px;
+	padding: 5px;
+	border: 2px solid #999;
+	border-radius: 5px;
+	background-color: #fff;
+	margin: 20px 40px;
+}
+div.buttonDiv {
+	display: inline-block;
+	width: 12%;
+	height: 17%;
+	vertical-align: top;
+	margin: 10px 0px;
+}
+
+input#sendTokenButton {
+	display: inline;
+	vertical-align: top;
+}
+input#resetButton {
+	display: inline;
+	vertical-align: bottom;
+}
+
+#sendTextArea {
+	display: inline;
+	width: 75%;
+	height: 15%;
+	margin: 10px 0px;
+}
+#systemTextArea {
+	display: inline;
+	width: 99%;
+	height: 35%;
+	margin: 0px;
+}
+#receiveTextArea {
+	display: inline;
+	width: 99%;
+	height: 28%;
+	margin: 10px 0px;
+}
