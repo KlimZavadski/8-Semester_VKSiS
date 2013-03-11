@@ -11,6 +11,19 @@
 </head>
 <body class="page">
 	<div id="" class="mainWindow" id="mainWindow">
+		<label>Address:</label>
+		<input type="number" id="receiveAddress" class="addressInput"/>
+
+		<label>Send to address:</label>
+		<input type="number" id="sendAddress" class="addressInput"/>
+
+		<label>Priority:</label>
+		<select id="stationPriority">
+			<option value="0">Low</option>
+			<option value="1">Medium</option>
+			<option value="2">Hight</option>
+		</select>
+
 		<textarea id="sendTextArea"></textarea>
 		<div class="buttonDiv">
 			<input type="button" id="sendTokenButton" class="button" value="Send Token"/>
@@ -18,6 +31,6 @@
 		</div>
 		<textarea id="systemTextArea"></textarea>
 		<textarea id="receiveTextArea"></textarea>
-	</div>	
+	</div>
 </body>
 </html>

@@ -1,12 +1,13 @@
 body.page {
 	background-color: #ddd;
 	font-family: "Calibry";
+	font-size: 11pt;
 }
 
 
 div.mainWindow {
 	display: inline-block;
-	width: 400px;
+	width: 500px;
 	height: 250px;
 	padding: 5px;
 	border: 2px solid #999;
@@ -23,24 +24,27 @@ div.buttonDiv {
 }
 
 input#sendTokenButton {
-	display: inline;
+	visibility: hidden;
 	vertical-align: top;
 }
 input#resetButton {
 	display: inline;
 	vertical-align: bottom;
 }
+input.addressInput {
+	width: 50px;
+}
 
 #sendTextArea {
 	display: inline;
-	width: 75%;
+	width: 80%;
 	height: 15%;
 	margin: 10px 0px;
 }
 #systemTextArea {
 	display: inline;
 	width: 99%;
-	height: 35%;
+	height: 25%;
 	margin: 0px;
 }
 #receiveTextArea {
