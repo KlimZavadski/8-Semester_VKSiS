@@ -1,225 +1,57 @@
-var debug = true;
+
+var debug = false//true;
 
 var monitorObject = "monitorObject";
 var tokenObject = "tokenObject";
 var stationObject = "stationObject";
 
-var isMonitor = false;
-var stations = new Array();
 var marker = {
 	priority: 2,
 	reservedPriority: 0,
-	isMonitor: false,
 	isMarker: true,
 
 	data: "",
 	destination: 0,
 	source: 0,
-	isRead: false
 };
 
-var address;
-var stationId = parseInt(Math.random() * 1000);
+var address = 0;
+var destination = 0;
+var priority = 0;
+var stationId = parseInt(Math.random() * 10000);
 var timeStart = null;
-var timeLimit = 10 * 1000;
-var sendDelay = 500;
+var timeLimit = 6 * 1000;
+var sendDelay = 200;
 var countSendedSymbols = 0;
-var isFirstSend = true;
 
 
-$(document).ready(function () {
-	window.addEventListener('storage', ReceiveData, false);
 
-	if (!localStorage.getItem(monitorObject))
-	{
-		localStorage.setItem(monitorObject, false);
-		isMonitor = true;
-		stations.push({
-			id: stationId,
-			address: 0
-		});
-		$('#sendTokenButton').css('visibility', 'visible');
-	}
+//function Stations() {
+	//this.array = new Array();
+	var stations = new Array();
 
-	$('#receiveAddress').change(function () {
-		address = $(this).val();
-		Debug(address);
-
-		if (isMonitor)
-		{
-			stations[0].address = address;
-		}
-		else
-		{
-			localStorage.setItem(stationObject, JSON.stringify({
-				id: stationId,
-				address: address
-			}));
-		}
-	});
-
-	$('#sendTokenButton').click(function () {
-		stations.sort(function sortFunction(a, b) {
-			if (a.address < b.address)
-				return -1;  // a < b.
-			if (a.address > b.address)
-				return 1;  // a > b.
-			return 0;  // a = b.
-		});
-		
-		var token = marker;
-		token.source = address;
-		SendToken({
-			stations: stations,
-			token: token,
-			index: 0
-		});
-	});
-
-	$('#resetButton').click(function () {
-		localStorage.clear();
-	});
-});
-
-
-function SendToken(object)
-{
-	if (object.stations.length > object.index)
-	{
-		if (object.stations[object.index].address == address)
-		{
-			object.index += 1;
-			SendToken(object);
-		}
-
-		Debug("Send token");
-		Sleep(sendDelay);
-		localStorage.setItem(tokenObject, JSON.stringify(object));
-	}
-	else
-	{
-		object.token.isMonitor = true;
-		object.index = 0;
-		SendToken(object);
-	}
-}
-
-function SendData(object)
-{
-	if (isFirstSend)
-	{
-		timeStart = new Date();
-		//object.token.reservedPriority = 0;
-	}
-	if ((new Date() - timeStart < timeLimit)
-		&& ($('#sendTextArea').val().length > countSendedSymbols))
-	//if (countSendedSymbols < 5)
-	{
-		object.token.priority = $('#stationPriority option:selected').val();
-		object.token.isMonitor = false;
-		object.token.isMarker = false;
-
-		object.token.data = $('#sendTextArea').val()[countSendedSymbols];
-		object.token.destination = $('#sendAddress').val();
-		object.token.source = address;
-		object.token.isRead = false;
-
-		Debug("Send '" + object.token.data + "'");
-		SendToken(object);
-
-		isFirstSend = false;
-		countSendedSymbols++;
-	}
-	else
-	{
-		isFirstSend = true;
-
-		var token = marker;
-		token.reservedPriority = object.reservedPriority;
-		SendToken({
-			stations: object.stations,
-			token: token,
-			index: object.index
-		});
-	}
-}
-
-function ReceiveData(event)
-{
-	if (event.key == tokenObject)
-	{
-		var object = JSON.parse(event.newValue);
-
-		// Token is back to station.
-		if (object.token.source == address)
-		{
-			Debug("Token is back");
-
-			if (object.token.isMarker)
-			{
-				object.index = 0;
-				object.token.priority = object.token.reservedPriority;
-				object.token.reservedPriority = 0;
-				SendToken(object);
-			}
-			else
-			{
-				SendData(object);
-			}
-		}
-		// This token is for this station.
-		else if (object.stations[object.index].address == address)
-		{
-			// This is marker.
-			if (object.token.isMarker)
-			{
-				Debug("Get marker");
-				var priority = $('#stationPriority option:selected').val();
-
-				if (priority < object.token.priority)
-				{
-					if (priority > object.token.reservedPriority)
-					{
-						Debug("Change priority");
-						object.token.reservedPriority = priority;
-					}
-					object.index += 1;
-					SendToken(object);
-				}
-				else if ($('#sendTextArea').val().length > countSendedSymbols)
-				{
-					Debug("Capture marker");
-					SendData(object);  //!!!!!!!!!!!!!!!!
-				}
-				else
-				{
-					object.index += 1;
-					SendToken(object);
-				}
-			}
-			// This is frame for us.
-			else if (object.token.destination == address)
-			{
-				Debug("Get token");
-				AddText('#receiveTextArea', object.token.data + "  ");
-
-				object.token.isRead = true;
-				object.index += 1;
-				SendToken(object);
-			}
-		}
-	}
-	// Change or add new station address in the network.
-	else if (event.key == stationObject && isMonitor)
-	{
-		var station = JSON.parse(event.newValue);
-		Debug("Get addr=" + station.address);
-		
+	//this.IndexOf = function (station) {
+	function IndexOf(station) {
 		var index = null;
-		$(stations).each(function (i, elem) {
-			if (elem.id == station.id)
+		for (var i = 0; i < stations.length; i++)
+		{
+			if (stations[i].id == station.id)
+			{
 				index = i;
-		});
+				break;
+			}
+		};
+		return index;
+	}
+	
+	//this.Add = function (station) {
+	function Add(station) {
+		stations.push(station);
+	}
+
+	//this.Change = function (station) {
+	function Change(station) {
+		var index = IndexOf(station);
 
 		if (index != null)  // Change old address.
 		{
@@ -228,6 +60,204 @@ function ReceiveData(event)
 		else
 		{
 			stations.push(station);
+		}
+	}
+
+
+$(document).ready(function ()
+{
+	window.addEventListener('storage', ReceiveData, false);
+
+	if (!localStorage.getItem(monitorObject))
+	{
+		localStorage.setItem(monitorObject, false);
+		$('#sendTokenButton').css('visibility', 'visible');
+	}
+
+	//stations.
+	Add({
+		id: stationId,
+		address: 0,
+		priority: 0
+	});
+
+	InitializeEvents();
+});
+
+function InitializeEvents()
+{
+	$('#receiveAddress,#sendAddress,#stationPriority').change(function () {
+		address = $('#receiveAddress').val();
+		destination = $('#sendAddress').val();
+		priority = $('#stationPriority option:selected').val();
+
+		Debug("Change to " + address + '-' + destination + '-' + priority);
+
+		var station = {
+			id: stationId,
+			address: address,
+			priority: priority
+		};
+		// Save station local.
+		//stations.
+		Change(station);
+		// Receive changes to network.
+		localStorage.setItem(stationObject, JSON.stringify(station));
+	});
+
+	$('#sendTokenButton').click(function () {
+		SendToken(0);
+	});
+
+	$('#resetButton').click(function () {
+		localStorage.clear();
+	});
+}
+
+
+function SendData()
+{
+	stations.sort(function sortFunction(a, b) {
+		if (a.address < b.address)
+			return -1;  // a < b.
+		if (a.address > b.address)
+			return 1;  // a > b.
+		return 0;  // a = b.
+	});
+	//var index = stations.IndexOf(object);
+	var index = IndexOf({id: stationId});
+	timeStart = new Date();
+	while (new Date() - timeStart < timeLimit)
+	{
+		if ($('#sendTextArea').val().length > countSendedSymbols)
+		{
+			var token = marker;
+			token.priority = priority;
+			token.reservedPriority = 0;
+			token.isMarker = false;
+			token.data = $('#sendTextArea').val()[countSendedSymbols];
+			token.destination = destination;
+			token.source = address;
+
+			var object = {
+				token: token,
+				endpoint: 0,
+				id: 0
+			};
+
+			Debug("Send '" + object.token.data + "'");
+
+			for (var i = index + 1; i <= stations.length + index; i++)
+			{
+				var station = stations[i % stations.length];
+				object.endpoint = station.address;	
+				object.id = station.id;			
+
+				// Receive local.
+				ReceiveToken(object);
+				// Receive to network.
+				Sleep(sendDelay);
+				localStorage.setItem(tokenObject, JSON.stringify(object));
+			};
+			countSendedSymbols++;
+		}
+	}
+	SendToken(index);
+}
+
+function SendToken(index)
+{
+	//stations.array.sort(function sortFunction(a, b) {
+	stations.sort(function sortFunction(a, b) {
+		if (a.address < b.address)
+			return -1;  // a < b.
+		if (a.address > b.address)
+			return 1;  // a > b.
+		return 0;  // a = b.
+	});
+
+	var token = marker;
+	token.priority = 2;
+	token.reservedPriority = 0;
+	token.isMarker = true;
+	token.data = "";
+	token.destination = 0;
+	token.source = 0;
+
+	var object = {
+		token: token,
+		endpoint: 0,
+		id: 0
+	};
+
+	for (var i = index + 1; i <= stations.length + index; i++)
+	{
+		var station = stations[i % stations.length];
+		object.endpoint = station.address;
+		object.id = station.id;
+		
+		// Receive local.
+		ReceiveToken(object);
+		// Receive to network.
+		Sleep(sendDelay);
+		localStorage.setItem(tokenObject, JSON.stringify(object));
+		
+		if (station.priority >= object.token.priority)
+			return;
+	};
+	SendData();
+}
+
+function ReceiveData(event)
+{
+	switch (event.key)
+	{
+		// Token is came on.
+		case tokenObject:
+			ReceiveToken(JSON.parse(event.newValue));
+			break;
+
+		// Change or add new station address in the network.
+		case stationObject:
+			var station = JSON.parse(event.newValue);
+			Debug("Get addr=" + station.address);
+			
+			Change(station);
+			break;
+	}
+}
+
+function ReceiveToken(object)
+{
+	if (object.endpoint == address)
+	{
+		if (object.token.isMarker)
+		{
+			Debug("Get Marker");
+			Log("*");
+
+			// Try to capture marker.
+			if (priority < object.token.priority)
+			{
+				if (priority > object.token.reservedPriority)
+				{
+					Debug("Change priority");
+				}
+			}
+			else if ($('#sendTextArea').val().length > countSendedSymbols)
+			{
+				Debug("Capture marker");
+				SendData();
+			}
+		}
+		else
+		{
+			Log("P");
+			if (object.token.source != address)
+			{
+				Debug("Get Token");
+				AddText('#receiveTextArea', object.token.data + "  ");
+			}
 		}
 	}
 }
@@ -250,11 +280,15 @@ function Sleep(millis)
 }
 
 
+function Log(text)
+{
+	AddText('#systemTextArea', text + "  ");
+}
 
 function Debug(text)
 {
 	if (debug)
 	{
-		AddText('#systemTextArea', '(' + text + ' ' + countSendedSymbols + ')  ');
+		Log(text);
 	}
 }
